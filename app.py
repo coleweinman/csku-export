@@ -8,6 +8,8 @@ headers = {
     'authorization': '',
 }
 
+subdomain = ""
+
 
 def get_client_data(start, stop):
     params = {
@@ -20,7 +22,7 @@ def get_client_data(start, stop):
         'with_sales_report': 'false',
     }
 
-    response = requests.get('https://logotology.commonsku.com/v1/company/clients', params=params, headers=headers)
+    response = requests.get('https://{subdomain}.commonsku.com/v1/company/clients', params=params, headers=headers)
 
     client_data = response.json()["companies"]
 
@@ -34,7 +36,7 @@ def get_client_data(start, stop):
             'parent_type': 'CLIENT',
             'parent_id': client['client_id'],
         }
-        response = requests.get('https://logotology.commonsku.com/v1/file', params=params, headers=headers)
+        response = requests.get('https://{subdomain}.commonsku.com/v1/file', params=params, headers=headers)
         files = response.json()['files']
         need_folders = False
         for file in files:
@@ -60,7 +62,7 @@ def get_folder_info(client):
         'parent_id': client['client_id'],
     }
     print("Getting folder info for %s" % client["client_name"])
-    response = requests.get('https://logotology.commonsku.com/v1/folder', params=params, headers=headers)
+    response = requests.get('https://{subdomain}.commonsku.com/v1/folder', params=params, headers=headers)
     folders = response.json()["folders"]
     folder_map = {}
     for folder in folders:
@@ -101,7 +103,7 @@ def organize_by_rep(start, stop):
         'with_sales_report': 'true',
     }
 
-    response = requests.get('https://logotology.commonsku.com/v1/company/clients', params=params, headers=headers)
+    response = requests.get('https://{subdomain}.commonsku.com/v1/company/clients', params=params, headers=headers)
     client_data = response.json()['companies']
     for client in client_data:
         name = client["client_name"].replace("/", "-")
@@ -137,6 +139,8 @@ if __name__ == "__main__":
             batch_size = int(sys.argv[i + 1])
         elif arg == "-o":
             output_path = sys.argv[i + 1]
+        elif arg == "-d":
+            subdomain = sys.argv[i + 1]
         print(f"Argument {i:>6}: {arg}")
 
     with open(auth_file_path, 'r') as f:
